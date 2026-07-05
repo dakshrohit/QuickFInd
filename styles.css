@@ -133,3 +133,31 @@ ul li:hover {
   border-color: #d43f3a !important;
   transform: scale(1.1);
 }
+
+.trie-node {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: uppercase;
+  border: 2px solid #555;
+  transition: all 0.3s ease;
+}
+
+.node-success {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+  transform: scale(1.1);
+}
+
+.node-fail {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+  transform: scale(1.1);
+}

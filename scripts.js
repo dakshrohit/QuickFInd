@@ -24,10 +24,10 @@ window.toggleVisualizerMode = function() {
         chartContainer.style.display = "none";
         
         document.getElementById("autocomplete-input").value = "";
-        document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize Single Hashing.";
+        document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize the selected algorithm.";
         document.getElementById("visualizer-blocks").innerHTML = "";
+        document.getElementById("visualizer-blocks").style.flexDirection = "row";
         document.getElementById("visualizer-status").innerHTML = "";
-        document.getElementById("algorithm").value = "single-hashing";
     } else {
         sampleWordSelect.style.display = "none";
         visualizerContainer.style.display = "none";
@@ -263,11 +263,20 @@ function autocomplete() {
 
     if (isVisualizerMode) {
         const sampleWord = document.getElementById("sample-word").value.toLowerCase();
+        document.getElementById("visualizer-blocks").style.flexDirection = "row";
         if (input !== "") {
-            window.visualizeSingleHashing(sampleWord, input);
+            if (algorithm === "single-hashing") {
+                window.visualizeSingleHashing(sampleWord, input);
+            } else if (algorithm === "double-hashing") {
+                window.visualizeDoubleHashing(sampleWord, input);
+            } else if (algorithm === "kmp") {
+                window.visualizeKMP(sampleWord, input);
+            } else if (algorithm === "trie") {
+                window.visualizeTrie(input);
+            }
         } else {
             document.getElementById("visualizer-blocks").innerHTML = "";
-            document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize Single Hashing.";
+            document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize the selected algorithm.";
             document.getElementById("visualizer-status").innerHTML = "";
         }
         return;
@@ -550,4 +559,259 @@ window.visualizeSingleHashing = async function(text, pattern) {
     const boxes = blocksContainer.querySelectorAll('.char-box');
     boxes.forEach(b => b.className = "char-box");
     statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern not found.</span>";
+}
+
+window.visualizeDoubleHashing = async function(text, pattern) {
+    const blocksContainer = document.getElementById("visualizer-blocks");
+    const infoContainer = document.getElementById("visualizer-info");
+    const statusContainer = document.getElementById("visualizer-status");
+    
+    blocksContainer.innerHTML = "";
+    for (let char of text) {
+        const span = document.createElement("span");
+        span.className = "char-box";
+        span.textContent = char;
+        blocksContainer.appendChild(span);
+    }
+    
+    const p1 = 31; 
+    const p2 = 37; 
+    const m = 1e9 + 9; 
+    const S = text.length;
+    const P = pattern.length;
+
+    if (P > S) {
+        statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern is longer than text!</span>";
+        infoContainer.innerHTML = "";
+        return;
+    }
+
+    let p1Pow = 1;
+    let p2Pow = 1;
+    for (let i = 0; i < P; i++) {
+        p1Pow = (p1Pow * p1) % m;
+        p2Pow = (p2Pow * p2) % m;
+    }
+
+    let patternHash1 = 0;
+    let patternHash2 = 0;
+    for (let i = 0; i < P; i++) {
+        patternHash1 = (patternHash1 * p1 + (pattern.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+        patternHash2 = (patternHash2 * p2 + (pattern.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+    }
+
+    let currentHash1 = 0;
+    let currentHash2 = 0;
+    for (let i = 0; i < P; i++) {
+        currentHash1 = (currentHash1 * p1 + (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+        currentHash2 = (currentHash2 * p2 + (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+    }
+
+    statusContainer.innerHTML = "Searching with Double Hashing...";
+
+    for (let i = 0; i + P - 1 < S; i++) {
+        const boxes = blocksContainer.querySelectorAll('.char-box');
+        boxes.forEach(b => b.className = "char-box");
+        
+        for (let j = 0; j < P; j++) {
+            if (boxes[i+j]) boxes[i+j].classList.add("window-active");
+        }
+        
+        infoContainer.innerHTML = `<div style="font-size: 14px; margin-bottom: 5px;">Pattern H1: <strong>${patternHash1}</strong> | Window H1: <strong>${currentHash1}</strong></div>
+                                   <div style="font-size: 14px;">Pattern H2: <strong>${patternHash2}</strong> | Window H2: <strong>${currentHash2}</strong></div>`;
+        
+        await new Promise(r => setTimeout(r, 600));
+
+        if (patternHash1 === currentHash1 && patternHash2 === currentHash2) {
+            if (text.substr(i, P) === pattern) {
+                for (let j = 0; j < P; j++) {
+                    if (boxes[i+j]) boxes[i+j].classList.add("match-success");
+                }
+                statusContainer.innerHTML = "<span style='color: #5cb85c'>Match Found!</span>";
+                return;
+            }
+        } else {
+             for (let j = 0; j < P; j++) {
+                if (boxes[i+j]) boxes[i+j].classList.add("match-fail");
+            }
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        if (i + P < S) {
+            currentHash1 = (currentHash1 * p1 - (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1) * p1Pow + (text.charCodeAt(i + P) - 'a'.charCodeAt(0) + 1)) % m;
+            if (currentHash1 < 0) currentHash1 += m;
+            currentHash2 = (currentHash2 * p2 - (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1) * p2Pow + (text.charCodeAt(i + P) - 'a'.charCodeAt(0) + 1)) % m;
+            if (currentHash2 < 0) currentHash2 += m;
+        }
+    }
+    
+    const boxes = blocksContainer.querySelectorAll('.char-box');
+    boxes.forEach(b => b.className = "char-box");
+    statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern not found.</span>";
+}
+
+window.visualizeKMP = async function(text, pattern) {
+    const blocksContainer = document.getElementById("visualizer-blocks");
+    const infoContainer = document.getElementById("visualizer-info");
+    const statusContainer = document.getElementById("visualizer-status");
+    
+    blocksContainer.innerHTML = "";
+    for (let char of text) {
+        const span = document.createElement("span");
+        span.className = "char-box";
+        span.textContent = char;
+        blocksContainer.appendChild(span);
+    }
+    
+    const N = text.length;
+    const M = pattern.length;
+
+    if (M > N) {
+        statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern is longer than text!</span>";
+        infoContainer.innerHTML = "";
+        return;
+    }
+    
+    infoContainer.innerHTML = "Building LPS (Longest Prefix Suffix) Array...";
+    const lps = new Array(M).fill(0);
+    let len = 0;
+    let i = 1;
+    
+    await new Promise(r => setTimeout(r, 600));
+    
+    while (i < M) {
+        if (pattern[i] === pattern[len]) {
+            len++;
+            lps[i] = len;
+            i++;
+        } else {
+            if (len !== 0) {
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+    
+    infoContainer.innerHTML = `<div style="font-size: 14px; margin-bottom: 5px;">LPS Array Built: <strong>[${lps.join(', ')}]</strong></div><div>Searching...</div>`;
+    statusContainer.innerHTML = "";
+
+    i = 0; 
+    let j = 0; 
+    while (N - i >= M - j) {
+        const boxes = blocksContainer.querySelectorAll('.char-box');
+        boxes.forEach(b => {
+            b.className = "char-box";
+            b.style.borderColor = "";
+        });
+        
+        let startIdx = i - j;
+        for (let k = 0; k < M; k++) {
+            if (boxes[startIdx + k]) boxes[startIdx + k].classList.add("window-active");
+        }
+        
+        if (boxes[i]) boxes[i].style.borderColor = "#ffeb3b"; 
+        
+        infoContainer.innerHTML = `<div style="font-size: 14px; margin-bottom: 5px;">LPS: <strong>[${lps.join(', ')}]</strong></div>
+                                   <div style="font-size: 14px;">Checking text[${i}]('<strong>${text[i]}</strong>') == pattern[${j}]('<strong>${pattern[j]}</strong>')</div>`;
+        await new Promise(r => setTimeout(r, 700));
+
+        if (pattern[j] === text[i]) {
+            if (boxes[i]) {
+                boxes[i].classList.remove("window-active");
+                boxes[i].classList.add("match-success");
+            }
+            j++;
+            i++;
+            await new Promise(r => setTimeout(r, 200));
+        }
+        
+        if (j === M) {
+            for (let k = 0; k < M; k++) {
+                if (boxes[startIdx + k]) {
+                    boxes[startIdx + k].className = "char-box match-success";
+                    boxes[startIdx + k].style.borderColor = "#4cae4c";
+                }
+            }
+            statusContainer.innerHTML = "<span style='color: #5cb85c'>Match Found!</span>";
+            return;
+        } else if (i < N && pattern[j] !== text[i]) {
+            if (boxes[i]) {
+                boxes[i].classList.remove("window-active");
+                boxes[i].classList.add("match-fail");
+            }
+            await new Promise(r => setTimeout(r, 400));
+            if (boxes[i]) {
+                boxes[i].style.borderColor = "";
+            }
+            
+            if (j !== 0) {
+                j = lps[j - 1];
+            } else {
+                i = i + 1;
+            }
+        }
+    }
+    
+    const boxes = blocksContainer.querySelectorAll('.char-box');
+    boxes.forEach(b => {
+        b.className = "char-box";
+        b.style.borderColor = "";
+    });
+    statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern not found.</span>";
+}
+
+window.visualizeTrie = async function(pattern) {
+    const blocksContainer = document.getElementById("visualizer-blocks");
+    const infoContainer = document.getElementById("visualizer-info");
+    const statusContainer = document.getElementById("visualizer-status");
+    
+    blocksContainer.innerHTML = "";
+    blocksContainer.style.display = "flex";
+    blocksContainer.style.flexDirection = "column";
+    blocksContainer.style.alignItems = "center";
+    
+    let currentNode = trie.root;
+    let found = true;
+    
+    infoContainer.innerHTML = `Traversing Trie for prefix: "<strong>${pattern}</strong>"...`;
+    
+    for (let i = 0; i < pattern.length; i++) {
+        const char = pattern[i];
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.gap = "10px";
+        row.style.marginBottom = "10px";
+        
+        const nodeBox = document.createElement("div");
+        nodeBox.className = "trie-node";
+        nodeBox.textContent = char;
+        row.appendChild(nodeBox);
+        blocksContainer.appendChild(row);
+        
+        await new Promise(r => setTimeout(r, 600));
+        
+        if (!currentNode.children[char]) {
+            nodeBox.classList.add("node-fail");
+            statusContainer.innerHTML = `<span style='color: #d9534f'>No path found for '${char}'. Prefix does not exist.</span>`;
+            found = false;
+            break;
+        } else {
+            nodeBox.classList.add("node-success");
+            currentNode = currentNode.children[char];
+        }
+    }
+    
+    if (found) {
+        statusContainer.innerHTML = "<span style='color: #5cb85c'>Prefix found in Trie! Fetching all descendants...</span>";
+        let words = trie.collectAllWords(currentNode, pattern);
+        if (words.length > 5) {
+            words = words.slice(0, 5);
+            words.push("...");
+        }
+        setTimeout(() => {
+            infoContainer.innerHTML = `Found ${words.length} matching cities: <strong>${words.join(', ')}</strong>`;
+        }, 1000);
+    }
 }
