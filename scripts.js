@@ -432,13 +432,13 @@ function updateMemoryStats() {
     const kb = (bytes / 1024).toFixed(2);
     
     document.getElementById("memory-stats").innerHTML = `
-        <h3 style="color: #f0ad4e; margin-top: 0;">Space Complexity (Memory Usage)</h3>
+        <h3 style="color: #fafafa; margin-top: 0; font-weight: 600;">Space Complexity (Memory Usage)</h3>
         <ul style="border: none; background: transparent; padding-left: 20px; overflow: hidden; margin-top: 0; max-height: none;">
             <li style="padding: 5px 0; background-color: transparent;"><strong>Single/Double Hashing:</strong> O(1) auxiliary space ( ~0 KB )</li>
             <li style="padding: 5px 0; background-color: transparent;"><strong>KMP:</strong> O(M) auxiliary space for LPS array ( ~0.1 KB )</li>
-            <li style="padding: 5px 0; background-color: transparent;"><strong>Trie:</strong> O(N * L) space. Built ${numNodes} nodes consuming approx. <span style="color:#d9534f; font-weight:bold">${kb} KB</span> of RAM.</li>
+            <li style="padding: 5px 0; background-color: transparent;"><strong>Trie:</strong> O(N * L) space. Built ${numNodes} nodes consuming approx. <span style="color:#ef4444; font-weight:bold">${kb} KB</span> of RAM.</li>
         </ul>
-        <p style="font-size: 14px; color: #aaa; margin-top: 10px;"><em>The Trie is extremely fast, but uses significantly more memory. This demonstrates the classic Space-Time Tradeoff!</em></p>
+        <p style="font-size: 14px; color: #a1a1aa; margin-top: 10px;"><em>The Trie is extremely fast, but uses significantly more memory. This demonstrates the classic Space-Time Tradeoff!</em></p>
     `;
 }
 
@@ -453,16 +453,16 @@ function initializeChart() {
             label: "Average Search Time (ms)",
             data: [NaN, NaN, NaN, NaN], 
             backgroundColor: [
-                "rgba(255, 206, 86, 0.2)", 
-                "rgba(75, 192, 192, 0.2)", 
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(54, 162, 235, 0.2)", 
+                "rgba(250, 250, 250, 0.2)", 
+                "rgba(161, 161, 170, 0.2)", 
+                "rgba(59, 130, 246, 0.2)",
+                "rgba(16, 185, 129, 0.2)", 
             ],
             borderColor: [
-                "rgba(255, 206, 86, 1)",
-                "rgba(75, 192, 192, 1)",
-                "rgba(153, 102, 255, 1)",
-                "rgba(54, 162, 235, 1)",
+                "rgba(250, 250, 250, 1)",
+                "rgba(161, 161, 170, 1)",
+                "rgba(59, 130, 246, 1)",
+                "rgba(16, 185, 129, 1)",
             ],
             borderWidth: 1,
             datalabels: {
@@ -471,7 +471,7 @@ function initializeChart() {
                 formatter: function (value, context) {
                 return value + " ms";
                 },
-                color: "#333",
+                color: "#fafafa",
                 font: {
                 weight: "bold",
                 },
@@ -496,7 +496,19 @@ function initializeChart() {
         scales: {
             yAxes: [{
             ticks: {
-                beginAtZero: true
+                beginAtZero: true,
+                fontColor: "#a1a1aa"
+            },
+            gridLines: {
+                color: "#27272a"
+            }
+            }],
+            xAxes: [{
+            ticks: {
+                fontColor: "#a1a1aa"
+            },
+            gridLines: {
+                display: false
             }
             }]
         }

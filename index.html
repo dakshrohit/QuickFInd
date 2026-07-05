@@ -22,16 +22,16 @@
             <option value="trie">Trie</option>
             </select>
             
-            <div class="visualizer-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: center; color: #eee; flex-wrap: wrap;">
-                <label style="cursor: pointer;">
-                    <input type="checkbox" id="fuzzy-toggle"> 
+            <div class="visualizer-controls" style="margin-bottom: 15px; display: flex; gap: 20px; align-items: center; justify-content: center; color: #a1a1aa; flex-wrap: wrap; font-size: 14px;">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <input type="checkbox" id="fuzzy-toggle" style="width: auto; margin: 0; accent-color: #3b82f6;"> 
                     Enable Typo Tolerance
                 </label>
-                <label style="cursor: pointer;">
-                    <input type="checkbox" id="visualizer-toggle" onchange="window.toggleVisualizerMode()"> 
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <input type="checkbox" id="visualizer-toggle" onchange="window.toggleVisualizerMode()" style="width: auto; margin: 0; accent-color: #3b82f6;"> 
                     Enable Visualizer Mode
                 </label>
-                <select id="sample-word" style="display: none; width: auto; margin-bottom: 0;">
+                <select id="sample-word" style="display: none; width: auto; margin: 0; padding: 6px 12px; font-size: 13px;">
                     <option value="washington">Washington</option>
                     <option value="san francisco">San Francisco</option>
                     <option value="new york">New York</option>
@@ -43,11 +43,11 @@
             <div id="time-taken"></div>
             <ul id="suggestions"></ul>
             
-            <div id="visualizer-container" style="display: none; text-align: center; margin-top: 20px; padding: 15px; border: 1px solid #777; border-radius: 8px; background-color: #2a2a2a;">
-                <h2 style="margin-top: 0; color: #f0ad4e;">Algorithm Visualizer</h2>
-                <div id="visualizer-info" style="margin-bottom: 15px; font-family: monospace; font-size: 16px;"></div>
-                <div id="visualizer-blocks" style="display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; margin-bottom: 15px;"></div>
-                <div id="visualizer-status" style="margin-top: 15px; font-weight: bold; font-size: 18px;"></div>
+            <div id="visualizer-container" style="display: none; text-align: center; margin-top: 25px; padding: 25px; border: 1px solid #27272a; border-radius: 12px; background-color: #09090b; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);">
+                <h2 style="margin-top: 0; color: #fafafa;">Algorithm Visualizer</h2>
+                <div id="visualizer-info" style="margin-bottom: 20px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; color: #a1a1aa; line-height: 1.5;"></div>
+                <div id="visualizer-blocks" style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+                <div id="visualizer-status" style="margin-top: 15px; font-weight: 600; font-size: 16px;"></div>
             </div>
             <div class="average-times-container">
             <h2>Average Search Times</h2>
@@ -59,7 +59,7 @@
             </div>
             <canvas id="average-times-chart" width="400" height="300"></canvas>
             
-            <div id="memory-stats" style="margin-top: 20px; padding: 15px; border-top: 1px solid #777;">
+            <div id="memory-stats" style="margin-top: 25px; padding: 25px; border: 1px solid #27272a; border-radius: 12px; background-color: #09090b;">
                 <p>Calculating memory usage...</p>
             </div>
             </div>
