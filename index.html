@@ -20,8 +20,30 @@
             <option value="double-hashing">Double String Hashing</option>
             <option value="trie">Trie</option>
             </select>
+            
+            <div class="visualizer-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: center; color: #eee;">
+                <label style="cursor: pointer;">
+                    <input type="checkbox" id="visualizer-toggle" onchange="window.toggleVisualizerMode()"> 
+                    Enable Visualizer Mode
+                </label>
+                <select id="sample-word" style="display: none; width: auto; margin-bottom: 0;">
+                    <option value="washington">Washington</option>
+                    <option value="san francisco">San Francisco</option>
+                    <option value="new york">New York</option>
+                    <option value="los angeles">Los Angeles</option>
+                    <option value="chicago">Chicago</option>
+                </select>
+            </div>
+
             <div id="time-taken"></div>
             <ul id="suggestions"></ul>
+            
+            <div id="visualizer-container" style="display: none; text-align: center; margin-top: 20px; padding: 15px; border: 1px solid #777; border-radius: 8px; background-color: #2a2a2a;">
+                <h2 style="margin-top: 0; color: #f0ad4e;">Algorithm Visualizer</h2>
+                <div id="visualizer-info" style="margin-bottom: 15px; font-family: monospace; font-size: 16px;"></div>
+                <div id="visualizer-blocks" style="display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; margin-bottom: 15px;"></div>
+                <div id="visualizer-status" style="margin-top: 15px; font-weight: bold; font-size: 18px;"></div>
+            </div>
             <div class="average-times-container">
             <h2>Average Search Times</h2>
             <div class="average-times">

@@ -7,6 +7,34 @@ let singleHashingCount = 0;
 let doubleHashingCount = 0;
 let trieCount = 0;
 let averageTimesChart;
+let isVisualizerMode = false;
+
+window.toggleVisualizerMode = function() {
+    isVisualizerMode = document.getElementById("visualizer-toggle").checked;
+    const sampleWordSelect = document.getElementById("sample-word");
+    const visualizerContainer = document.getElementById("visualizer-container");
+    const suggestionsList = document.getElementById("suggestions");
+    const chartContainer = document.querySelector(".average-times-container");
+
+    if (isVisualizerMode) {
+        sampleWordSelect.style.display = "inline-block";
+        visualizerContainer.style.display = "block";
+        suggestionsList.style.display = "none";
+        chartContainer.style.display = "none";
+        
+        document.getElementById("autocomplete-input").value = "";
+        document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize Single Hashing.";
+        document.getElementById("visualizer-blocks").innerHTML = "";
+        document.getElementById("visualizer-status").innerHTML = "";
+        document.getElementById("algorithm").value = "single-hashing";
+    } else {
+        sampleWordSelect.style.display = "none";
+        visualizerContainer.style.display = "none";
+        suggestionsList.style.display = "block";
+        chartContainer.style.display = "block";
+        autocomplete();
+    }
+}
 
 async function fetchData() {
     try {
@@ -188,6 +216,18 @@ function autocomplete() {
     const suggestions = [];
     const timeTakenElement = document.getElementById("time-taken");
 
+    if (isVisualizerMode) {
+        const sampleWord = document.getElementById("sample-word").value.toLowerCase();
+        if (input !== "") {
+            window.visualizeSingleHashing(sampleWord, input);
+        } else {
+            document.getElementById("visualizer-blocks").innerHTML = "";
+            document.getElementById("visualizer-info").innerHTML = "Type a search query to visualize Single Hashing.";
+            document.getElementById("visualizer-status").innerHTML = "";
+        }
+        return;
+    }
+
     if (input === "") {
         displaySuggestions(suggestions);
         timeTakenElement.textContent = "";
@@ -368,3 +408,82 @@ function resetStats() {
 }
 
 window.resetStats = resetStats;
+
+window.visualizeSingleHashing = async function(text, pattern) {
+    const blocksContainer = document.getElementById("visualizer-blocks");
+    const infoContainer = document.getElementById("visualizer-info");
+    const statusContainer = document.getElementById("visualizer-status");
+    
+    blocksContainer.innerHTML = "";
+    for (let char of text) {
+        const span = document.createElement("span");
+        span.className = "char-box";
+        span.textContent = char;
+        blocksContainer.appendChild(span);
+    }
+    
+    const p = 31; 
+    const m = 1e9 + 9; 
+    const S = text.length;
+    const P = pattern.length;
+
+    if (P > S) {
+        statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern is longer than text!</span>";
+        infoContainer.innerHTML = "";
+        return;
+    }
+
+    let pPow = 1;
+    for (let i = 0; i < P; i++) {
+        pPow = (pPow * p) % m;
+    }
+
+    let patternHash = 0;
+    for (let i = 0; i < P; i++) {
+        patternHash = (patternHash * p + (pattern.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+    }
+
+    let currentHash = 0;
+    for (let i = 0; i < P; i++) {
+        currentHash = (currentHash * p + (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1)) % m;
+    }
+
+    statusContainer.innerHTML = "Searching...";
+
+    for (let i = 0; i + P - 1 < S; i++) {
+        const boxes = blocksContainer.querySelectorAll('.char-box');
+        boxes.forEach(b => b.className = "char-box");
+        
+        for (let j = 0; j < P; j++) {
+            if (boxes[i+j]) boxes[i+j].classList.add("window-active");
+        }
+        
+        infoContainer.innerHTML = `Pattern Hash: <strong>${patternHash}</strong> | Window Hash: <strong>${currentHash}</strong>`;
+        
+        await new Promise(r => setTimeout(r, 600));
+
+        if (patternHash === currentHash) {
+            if (text.substr(i, P) === pattern) {
+                for (let j = 0; j < P; j++) {
+                    if (boxes[i+j]) boxes[i+j].classList.add("match-success");
+                }
+                statusContainer.innerHTML = "<span style='color: #5cb85c'>Match Found!</span>";
+                return;
+            }
+        } else {
+             for (let j = 0; j < P; j++) {
+                if (boxes[i+j]) boxes[i+j].classList.add("match-fail");
+            }
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        if (i + P < S) {
+            currentHash = (currentHash * p - (text.charCodeAt(i) - 'a'.charCodeAt(0) + 1) * pPow + (text.charCodeAt(i + P) - 'a'.charCodeAt(0) + 1)) % m;
+            if (currentHash < 0) currentHash += m;
+        }
+    }
+    
+    const boxes = blocksContainer.querySelectorAll('.char-box');
+    boxes.forEach(b => b.className = "char-box");
+    statusContainer.innerHTML = "<span style='color: #d9534f'>Pattern not found.</span>";
+}

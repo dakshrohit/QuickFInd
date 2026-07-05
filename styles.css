@@ -95,3 +95,41 @@ ul li:hover {
 .slide-in {
   animation: slideIn 0.3s ease;
 }
+
+/* Visualizer Styles */
+.char-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 40px;
+  background-color: #444;
+  color: #eee;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 2px solid #555;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.window-active {
+  background-color: #5bc0de;
+  color: #111;
+  border-color: #31b0d5;
+  transform: scale(1.1);
+}
+
+.match-success {
+  background-color: #5cb85c !important;
+  color: #fff !important;
+  border-color: #4cae4c !important;
+  transform: scale(1.1);
+}
+
+.match-fail {
+  background-color: #d9534f !important;
+  color: #fff !important;
+  border-color: #d43f3a !important;
+  transform: scale(1.1);
+}
