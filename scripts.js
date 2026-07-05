@@ -331,6 +331,22 @@ function autocomplete() {
     let timeTaken = endTime - startTime;
     algorithmTimes.push(timeTaken);
 
+    if (suggestions.length === 0 && document.getElementById("fuzzy-toggle").checked && input.length >= 3) {
+        const fuzzyResults = [];
+        for (const state of statesData) {
+            for (const city of state.cities) {
+                const dist = levenshteinDistance(input, city.toLowerCase());
+                if (dist <= 2) {
+                    fuzzyResults.push({ city, dist });
+                }
+            }
+        }
+        fuzzyResults.sort((a, b) => a.dist - b.dist);
+        for (let k = 0; k < Math.min(5, fuzzyResults.length); k++) {
+            suggestions.push(fuzzyResults[k].city + " (Typo Match)");
+        }
+    }
+
     const averageTime = calculateAverage(algorithmTimes, algorithm);
 
     console.log(
@@ -814,4 +830,32 @@ window.visualizeTrie = async function(pattern) {
             infoContainer.innerHTML = `Found ${words.length} matching cities: <strong>${words.join(', ')}</strong>`;
         }, 1000);
     }
+}
+
+function levenshteinDistance(a, b) {
+    const matrix = [];
+    let i;
+    for (i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+    let j;
+    for (j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+    for (i = 1; i <= b.length; i++) {
+        for (j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, 
+                    Math.min(
+                        matrix[i][j - 1] + 1, 
+                        matrix[i - 1][j] + 1 
+                    )
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
 }

@@ -22,7 +22,11 @@
             <option value="trie">Trie</option>
             </select>
             
-            <div class="visualizer-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: center; color: #eee;">
+            <div class="visualizer-controls" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; justify-content: center; color: #eee; flex-wrap: wrap;">
+                <label style="cursor: pointer;">
+                    <input type="checkbox" id="fuzzy-toggle"> 
+                    Enable Typo Tolerance
+                </label>
                 <label style="cursor: pointer;">
                     <input type="checkbox" id="visualizer-toggle" onchange="window.toggleVisualizerMode()"> 
                     Enable Visualizer Mode
