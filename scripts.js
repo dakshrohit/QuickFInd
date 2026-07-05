@@ -1,10 +1,11 @@
-
 let statesData = [];
 let singleHashingTimes = [];
 let doubleHashingTimes = [];
+let kmpTimes = [];
 let trieTimes = [];
 let singleHashingCount = 0;
 let doubleHashingCount = 0;
+let kmpCount = 0;
 let trieCount = 0;
 let averageTimesChart;
 let isVisualizerMode = false;
@@ -149,6 +150,50 @@ function doubleHashingSearch(text, pattern) {
     return false;
 }
 
+function kmpSearch(text, pattern) {
+    const N = text.length;
+    const M = pattern.length;
+
+    if (M === 0) return true;
+
+    const lps = new Array(M).fill(0);
+    let len = 0;
+    let i = 1;
+    while (i < M) {
+        if (pattern[i] === pattern[len]) {
+            len++;
+            lps[i] = len;
+            i++;
+        } else {
+            if (len !== 0) {
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+
+    i = 0; 
+    let j = 0; 
+    while (N - i >= M - j) {
+        if (pattern[j] === text[i]) {
+            j++;
+            i++;
+        }
+        if (j === M) {
+            return true;
+        } else if (i < N && pattern[j] !== text[i]) {
+            if (j !== 0) {
+                j = lps[j - 1];
+            } else {
+                i = i + 1;
+            }
+        }
+    }
+    return false;
+}
+
 class TrieNode {
     constructor() {
         this.children = {};
@@ -257,6 +302,16 @@ function autocomplete() {
             }
         }
         }
+    } else if (algorithm === "kmp") {
+        algorithmTimes = kmpTimes;
+        kmpCount++;
+        for (const state of statesData) {
+        for (const city of state.cities) {
+            if (kmpSearch(city.toLowerCase(), input)) {
+            suggestions.push(city);
+            }
+        }
+        }
     } else if (algorithm === "trie") {
         algorithmTimes = trieTimes;
         trieCount++;
@@ -311,11 +366,14 @@ setInterval(() => {
         doubleHashingTimes,
         "Double Hashing"
     );
+    document.getElementById("kmp-average").textContent = calculateAverage(
+        kmpTimes,
+        "KMP"
+    );
     document.getElementById("trie-average").textContent = calculateAverage(
         trieTimes,
         "Trie"
     );
-
 
     updateAverageTimesChart();
 }, 1000); 
@@ -324,6 +382,7 @@ function updateAverageTimesChart() {
     averageTimesChart.data.datasets[0].data = [
         parseFloat(calculateAverage(singleHashingTimes, "Single Hashing")),
         parseFloat(calculateAverage(doubleHashingTimes, "Double Hashing")),
+        parseFloat(calculateAverage(kmpTimes, "KMP")),
         parseFloat(calculateAverage(trieTimes, "Trie")),
     ];
     averageTimesChart.update();
@@ -338,19 +397,21 @@ function initializeChart() {
     averageTimesChart = new Chart(ctx, {
         type: "bar",
         data: {
-        labels: ["Single Hashing", "Double Hashing", "Trie"],
+        labels: ["Single Hashing", "Double Hashing", "KMP", "Trie"],
         datasets: [
             {
             label: "Average Search Time (ms)",
-            data: [NaN, NaN, NaN], 
+            data: [NaN, NaN, NaN, NaN], 
             backgroundColor: [
                 "rgba(255, 206, 86, 0.2)", 
                 "rgba(75, 192, 192, 0.2)", 
+                "rgba(153, 102, 255, 0.2)",
                 "rgba(54, 162, 235, 0.2)", 
             ],
             borderColor: [
                 "rgba(255, 206, 86, 1)",
                 "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
                 "rgba(54, 162, 235, 1)",
             ],
             borderWidth: 1,
@@ -398,12 +459,15 @@ initializeChart();
 function resetStats() {
     singleHashingTimes = [];
     doubleHashingTimes = [];
+    kmpTimes = [];
     trieTimes = [];
     singleHashingCount = 0;
     doubleHashingCount = 0;
+    kmpCount = 0;
     trieCount = 0;
     document.getElementById("single-hashing-average").textContent = "Not used yet";
     document.getElementById("double-hashing-average").textContent = "Not used yet";
+    document.getElementById("kmp-average").textContent = "Not used yet";
     document.getElementById("trie-average").textContent = "Not used yet";
 }
 
