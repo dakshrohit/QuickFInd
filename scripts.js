@@ -240,6 +240,14 @@ class Trie {
         }
         return words;
     }
+
+    countNodes(node = this.root) {
+        let count = 1;
+        for (const char in node.children) {
+            count += this.countNodes(node.children[char]);
+        }
+        return count;
+    }
 }
 
 const trie = new Trie();
@@ -415,7 +423,24 @@ function updateAverageTimesChart() {
 
 setTimeout(() => {
     initializeTrie();
+    updateMemoryStats();
 }, 1000);
+
+function updateMemoryStats() {
+    const numNodes = trie.countNodes();
+    const bytes = numNodes * 32; // Approx 32 bytes per object in V8
+    const kb = (bytes / 1024).toFixed(2);
+    
+    document.getElementById("memory-stats").innerHTML = `
+        <h3 style="color: #f0ad4e; margin-top: 0;">Space Complexity (Memory Usage)</h3>
+        <ul style="border: none; background: transparent; padding-left: 20px; overflow: hidden; margin-top: 0; max-height: none;">
+            <li style="padding: 5px 0; background-color: transparent;"><strong>Single/Double Hashing:</strong> O(1) auxiliary space ( ~0 KB )</li>
+            <li style="padding: 5px 0; background-color: transparent;"><strong>KMP:</strong> O(M) auxiliary space for LPS array ( ~0.1 KB )</li>
+            <li style="padding: 5px 0; background-color: transparent;"><strong>Trie:</strong> O(N * L) space. Built ${numNodes} nodes consuming approx. <span style="color:#d9534f; font-weight:bold">${kb} KB</span> of RAM.</li>
+        </ul>
+        <p style="font-size: 14px; color: #aaa; margin-top: 10px;"><em>The Trie is extremely fast, but uses significantly more memory. This demonstrates the classic Space-Time Tradeoff!</em></p>
+    `;
+}
 
 function initializeChart() {
     const ctx = document.getElementById("average-times-chart").getContext("2d");
